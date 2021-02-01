@@ -2,10 +2,22 @@ include("jake/lib/snake")
 include("jake/lib/rib")
 include("jake/lib/apple")
 
+-- engine
+engine.name = 'PolyPerc'
+
+-- clock
 lattice = require("lattice")
+
+-- music
+music = require("musicutil")
+mode = 11
+scale = music.generate_scale_of_length(36, music.SCALES[mode].name, 24)
+transpose = 0
 
 -- init
 function init()
+    game_state = 'menu'
+
     -- create a lattice
     my_lattice = lattice:new{
         auto = true,
@@ -16,7 +28,7 @@ function init()
     -- start the lattice
     my_lattice:start()
 
-    game_state = 'menu'
+    -- redraw screen
     redraw()
 end
 
@@ -27,18 +39,23 @@ function new_game()
     -- make a snake
     -- TODO: randomize starting position
     local new_ribs = {}
-    table.insert(new_ribs, Rib:create{x=7,y=5, note=60})
-    table.insert(new_ribs, Rib:create{x=6,y=5, note=62})
-    table.insert(new_ribs, Rib:create{x=5,y=5, note=64})
-    table.insert(new_ribs, Rib:create{x=4,y=5, note=67})
+    table.insert(new_ribs, Rib:create{x=7,y=5,note=1})
+    table.insert(new_ribs, Rib:create{x=6,y=5,note=2})
+    table.insert(new_ribs, Rib:create{x=5,y=5,note=3})
+    table.insert(new_ribs, Rib:create{x=4,y=5,note=4})
     new_direction = 'E'
     snake = Snake:create{ribs = new_ribs, direction=new_direction}
 
     -- make a movement pattern
     movement_pattern = my_lattice:new_pattern{
         action = function(t) move_snake() end,
-        division = 1/4,
-        enabled = false
+        division = 1/4
+    }
+
+    -- make a sequencer pattern
+    sequencer_pattern = my_lattice:new_pattern{
+        action = function(t) advance_sequence() end,
+        division = 1/8
     }
 
     -- make initial apple
@@ -49,14 +66,13 @@ function new_game()
     while snake:check_coordinate_occupied(apple.x, apple.y) do
         apple = Apple:create{x=math.random(16), y=math.random(8)}
     end
-
-    movement_pattern:start()
 end
 
 -- game over, pal
 function game_over()
     game_state = 'game_over'
     movement_pattern:stop()
+    sequencer_pattern:destroy()
     redraw()
 end
 
@@ -75,7 +91,7 @@ function move_snake()
     if snake:check_apple_collision(apple) then
         -- calculate note from apple position
         -- TODO: calculate notes some other way
-        apple_note = apple.x + 8 * apple.y
+        apple_note = apple.x + apple.y - 1
 
         -- delete old apple and make a new apple
         -- but, if the new apple would overlap with the snake, keep trying new coordinates
@@ -91,6 +107,22 @@ function move_snake()
     -- redraw everything
     grid_redraw()
     redraw()
+end
+
+function advance_sequence()
+    -- get current note based on scale, step, and transpose
+    local this_note = scale[snake.ribs[snake.active_step].note] + transpose
+
+    -- play note
+    note_on(this_note)
+
+    -- advance counter
+    snake.active_step = (snake.active_step) % (#snake.ribs) + 1
+end
+
+function note_on(note)
+    local freq = music.note_num_to_freq(note)
+    engine.hz(freq)
 end
 
 -- grid interaction

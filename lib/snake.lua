@@ -10,8 +10,9 @@ function Snake:create(s)
     snake.dx = s.dx
     snake.dy = s.dy
     snake.direction = s.direction
-    snake:steer(snake.direction)
     snake.last_tail = snake.ribs[#snake.ribs]
+    snake.active_step = 1
+    snake:steer(snake.direction)
     return snake
 end
 
