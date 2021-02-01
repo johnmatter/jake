@@ -58,7 +58,6 @@ end
 
 -- grow
 function Snake:grow(note)
-    print('tail pos ' .. self.last_tail.x .. ' ' .. self.last_tail.y)
     table.insert(self.ribs, Rib:create{self.last_tail.x, self.last_tail.y, note})
 end
 
