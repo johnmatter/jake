@@ -27,10 +27,10 @@ function new_game()
     -- make a snake
     -- TODO: randomize starting position
     local new_ribs = {}
-    table.insert(new_ribs, Rib:create{x=7,y=5})
-    table.insert(new_ribs, Rib:create{x=6,y=5})
-    table.insert(new_ribs, Rib:create{x=5,y=5})
-    table.insert(new_ribs, Rib:create{x=4,y=5})
+    table.insert(new_ribs, Rib:create{x=7,y=5, note=60})
+    table.insert(new_ribs, Rib:create{x=6,y=5, note=62})
+    table.insert(new_ribs, Rib:create{x=5,y=5, note=64})
+    table.insert(new_ribs, Rib:create{x=4,y=5, note=67})
     new_direction = 'E'
     snake = Snake:create{ribs = new_ribs, direction=new_direction}
 
@@ -73,6 +73,10 @@ function move_snake()
 
     -- check if we've eaten an apple (yum)
     if snake:check_apple_collision(apple) then
+        -- calculate note from apple position
+        -- TODO: calculate notes some other way
+        apple_note = apple.x + 8 * apple.y
+
         -- delete old apple and make a new apple
         -- but, if the new apple would overlap with the snake, keep trying new coordinates
         apple = Apple:create{x=math.random(16), y=math.random(8)}
@@ -81,7 +85,7 @@ function move_snake()
         end
 
         -- grow a rib
-        snake:grow()
+        snake:grow(apple_note)
     end
 
     -- redraw everything

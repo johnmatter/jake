@@ -7,7 +7,7 @@ function Rib:create(r)
     setmetatable(rib,Rib)
     rib.x = r.x
     rib.y = r.y
-    rib.note = r.note or 60
+    rib.note = r.note
     return rib
 end
 

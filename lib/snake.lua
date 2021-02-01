@@ -57,8 +57,13 @@ function Snake:steer(dir)
 end
 
 -- grow
-function Snake:grow(note)
-    table.insert(self.ribs, Rib:create{self.last_tail.x, self.last_tail.y, note})
+function Snake:grow(new_note)
+    new_rib = Rib:create{
+        x=self.last_tail.x,
+        y=self.last_tail.y,
+        note=new_note
+    }
+    table.insert(self.ribs, new_rib)
 end
 
 -- check if snake collided with an object
@@ -98,6 +103,6 @@ end
 -- print for debug
 function Snake:print()
     for n,rib in pairs(self.ribs) do
-        print(string.format('%2d %2d %2d', n, rib.x, rib.y))
+        print(string.format('%2d %2d %2d %d', n, rib.x, rib.y, rib.note))
     end
 end
