@@ -180,18 +180,15 @@ end
 
 -- key input
 function key(n,z)
-    if game_state == 'menu' then
-        if n==3 and z==1 then
+    if n==3 and z==1 then
+        if game_state == 'menu' then
             new_game()
-        end
-    end
-    if game_state == 'playing' then
-        if n==2 and z==1 then
             movement_pattern:toggle()
         end
-    end
-    if game_state == 'game_over' then
-        if n==3 and z==1 then
+        if game_state == 'playing' then
+            movement_pattern:toggle()
+        end
+        if game_state == 'game_over' then
             new_game()
         end
     end
