@@ -11,7 +11,7 @@ function Rib:create(r)
     return rib
 end
 
--- draw rib, with default brightness 5
+-- draw rib, with default brightness 3
 function Rib:draw(brightness)
     if self:is_initialized() then
         g:led(self.x, self.y, brightness or 3)

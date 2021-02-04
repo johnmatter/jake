@@ -10,7 +10,7 @@ function Apple:create(a)
     return apple
 end
 
--- draw rib, with default brightness 5
+-- draw apple, with default brightness 7
 function Apple:draw(brightness)
     g:led(self.x, self.y, brightness or 7)
 end

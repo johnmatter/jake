@@ -2,20 +2,25 @@ include("jake/lib/snake")
 include("jake/lib/rib")
 include("jake/lib/apple")
 
--- engine
-engine.name = 'PolyPerc'
-
 -- clock
 lattice = require("lattice")
 
 -- music
 music = require("musicutil")
-mode = 11
-scale = music.generate_scale_of_length(36, music.SCALES[mode].name, 24)
+mode_index = 11
+scale = music.generate_scale_of_length(48, music.SCALES[mode_index].name, 24)
 transpose = 0
+
+last_note = nil
+
+-- engine
+local MollyThePoly = require("molly_the_poly/lib/molly_the_poly_engine")
+engine.name = "MollyThePoly"
 
 -- init
 function init()
+    MollyThePoly.add_params()
+
     game_state = 'menu'
 
     -- create a lattice
@@ -40,22 +45,22 @@ function new_game()
     -- TODO: randomize starting position
     local new_ribs = {}
     table.insert(new_ribs, Rib:create{x=7,y=5,note=1})
-    table.insert(new_ribs, Rib:create{x=6,y=5,note=2})
-    table.insert(new_ribs, Rib:create{x=5,y=5,note=3})
-    table.insert(new_ribs, Rib:create{x=4,y=5,note=4})
+    table.insert(new_ribs, Rib:create{x=6,y=5,note=3})
+    table.insert(new_ribs, Rib:create{x=5,y=5,note=1})
+    table.insert(new_ribs, Rib:create{x=4,y=5,note=2})
     new_direction = 'E'
     snake = Snake:create{ribs = new_ribs, direction=new_direction}
 
     -- make a movement pattern
     movement_pattern = my_lattice:new_pattern{
         action = function(t) move_snake() end,
-        division = 1/4
+        division = 1/8
     }
 
     -- make a sequencer pattern
     sequencer_pattern = my_lattice:new_pattern{
         action = function(t) advance_sequence() end,
-        division = 1/8
+        division = 1/16
     }
 
     -- make initial apple
@@ -66,11 +71,16 @@ function new_game()
     while snake:check_coordinate_occupied(apple.x, apple.y) do
         apple = Apple:create{x=math.random(16), y=math.random(8)}
     end
+
+    movement_pattern.enabled = true
+    grid_redraw()
+    redraw()
 end
 
 -- game over, pal
 function game_over()
     game_state = 'game_over'
+    note_off(last_note)
     movement_pattern:stop()
     sequencer_pattern:destroy()
     redraw()
@@ -110,11 +120,18 @@ function move_snake()
 end
 
 function advance_sequence()
-    -- get current note based on scale, step, and transpose
+    -- get next note based on scale, step, and transpose
     local this_note = scale[snake.ribs[snake.active_step].note] + transpose
+
+    -- turn off last note
+    -- TODO: add gate length somehow and possibility for notes to overlap
+    if last_note then
+        note_off(last_note)
+    end
 
     -- play note
     note_on(this_note)
+    last_note = this_note
 
     -- advance counter
     snake.active_step = (snake.active_step) % (#snake.ribs) + 1
@@ -122,7 +139,11 @@ end
 
 function note_on(note)
     local freq = music.note_num_to_freq(note)
-    engine.hz(freq)
+    engine.noteOn(note,freq,80)
+end
+
+function note_off(note)
+    engine.noteOff(note)
 end
 
 -- grid interaction
@@ -165,7 +186,7 @@ function key(n,z)
         end
     end
     if game_state == 'playing' then
-        if n==3 and z==1 then
+        if n==2 and z==1 then
             movement_pattern:toggle()
         end
     end

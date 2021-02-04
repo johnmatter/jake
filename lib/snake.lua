@@ -18,8 +18,11 @@ end
 
 -- draw the snake
 function Snake:draw()
-    for n, rib in pairs(self.ribs) do
-        rib:draw()
+    -- draw the head a little brighter to orient the player
+    self.ribs[1]:draw(6)
+    -- draw the other ribs with the default brightness
+    for n=2,#self.ribs do
+        self.ribs[n]:draw()
     end
 end
 
