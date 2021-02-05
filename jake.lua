@@ -29,7 +29,6 @@ function init()
     scale_index = 11
     scale_name = scale_names[scale_index]
     scale = music.generate_scale_of_length(root_note, scale_name, 24)
-    print('scale name in init: ' .. scale_name)
 
     -- setup params
 
@@ -146,13 +145,11 @@ end
 -- sequence and music stuff
 function set_scale(new_scale_name)
   scale = music.generate_scale_of_length(root_note, new_scale_name, 24)
-  print('set scale: ' .. scale_name)
 end
 
 function set_root_note(new_root_note)
   root_note = new_root_note
   scale = music.generate_scale_of_length(new_root_note, scale_name, 24)
-  print('set root note: ' .. music.note_num_to_name(new_root_note))
 end
 
 function advance_sequence()
