@@ -7,11 +7,6 @@ lattice = require("lattice")
 
 -- music
 music = require("musicutil")
-mode_index = 11
-scale = music.generate_scale_of_length(48, music.SCALES[mode_index].name, 24)
-transpose = 0
-
-last_note = nil
 
 -- engine
 local MollyThePoly = require("molly_the_poly/lib/molly_the_poly_engine")
@@ -19,6 +14,34 @@ engine.name = "MollyThePoly"
 
 -- init
 function init()
+
+    scale_names = {}
+    for n=1,#music.SCALES do
+        table.insert(scale_names, music.SCALES[n].name)
+    end
+
+    note_names = {}
+    for n=0,100 do
+        table.insert(note_names, music.note_num_to_name(n,true))
+    end
+
+    root_note = 48
+    scale_index = 11
+    scale_name = scale_names[scale_index]
+    scale = music.generate_scale_of_length(root_note, scale_name, 24)
+    print('scale name in init: ' .. scale_name)
+
+    -- setup params
+
+    params:add_separator()
+    params:add_option("scale", "scale", scale_names, 11)
+    params:set_action("scale", set_scale)
+
+    -- TODO: figure out why this displays the note off by one
+    params:add_option("root_note", "root note", note_names, 48)
+    params:set_action("root_note", set_root_note)
+
+    params:add_separator()
     MollyThePoly.add_params()
 
     game_state = 'menu'
@@ -58,6 +81,7 @@ function new_game()
     }
 
     -- make a sequencer pattern
+    last_note = nil
     sequencer_pattern = my_lattice:new_pattern{
         action = function(t) advance_sequence() end,
         division = 1/16
@@ -119,9 +143,21 @@ function move_snake()
     redraw()
 end
 
+-- sequence and music stuff
+function set_scale(new_scale_name)
+  scale = music.generate_scale_of_length(root_note, new_scale_name, 24)
+  print('set scale: ' .. scale_name)
+end
+
+function set_root_note(new_root_note)
+  root_note = new_root_note
+  scale = music.generate_scale_of_length(new_root_note, scale_name, 24)
+  print('set root note: ' .. music.note_num_to_name(new_root_note))
+end
+
 function advance_sequence()
-    -- get next note based on scale, step, and transpose
-    local this_note = scale[snake.ribs[snake.active_step].note] + transpose
+    -- get next note based on scale and step
+    local this_note = scale[snake.ribs[snake.active_step].note]
 
     -- turn off last note
     -- TODO: add gate length somehow and possibility for notes to overlap
