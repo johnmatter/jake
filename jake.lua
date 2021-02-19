@@ -66,10 +66,10 @@ function new_game()
     -- make a snake
     -- TODO: randomize starting position
     local new_ribs = {}
-    table.insert(new_ribs, Rib:create{x=7,y=5,note=1})
-    table.insert(new_ribs, Rib:create{x=6,y=5,note=3})
-    table.insert(new_ribs, Rib:create{x=5,y=5,note=1})
-    table.insert(new_ribs, Rib:create{x=4,y=5,note=2})
+    table.insert(new_ribs, Rib:create{x=7,y=5,note=math.random(10),brightness=6})
+    table.insert(new_ribs, Rib:create{x=6,y=5,note=math.random(10),brightness=3})
+    table.insert(new_ribs, Rib:create{x=5,y=5,note=math.random(10),brightness=3})
+    table.insert(new_ribs, Rib:create{x=4,y=5,note=math.random(10),brightness=3})
     new_direction = 'E'
     snake = Snake:create{ribs = new_ribs, direction=new_direction}
 

@@ -8,10 +8,11 @@ function Rib:create(r)
     rib.x = r.x
     rib.y = r.y
     rib.note = r.note
+    rib.brightness = r.brightness
     return rib
 end
 
 -- draw rib, with default brightness 3
 function Rib:draw(brightness)
-    g:led(self.x, self.y, brightness or 3)
+    g:led(self.x, self.y, brightness or self.brightness)
 end

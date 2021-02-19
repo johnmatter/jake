@@ -18,10 +18,7 @@ end
 
 -- draw the snake
 function Snake:draw()
-    -- draw the head a little brighter to orient the player
-    self.ribs[1]:draw(6)
-    -- draw the other ribs with the default brightness
-    for n=2,#self.ribs do
+    for n=1,#self.ribs do
         self.ribs[n]:draw()
     end
 end
@@ -65,7 +62,8 @@ function Snake:grow(new_note)
     new_rib = Rib:create{
         x=self.last_tail.x,
         y=self.last_tail.y,
-        note=new_note
+        note=new_note,
+        brightness=3
     }
     table.insert(self.ribs, new_rib)
 end
